@@ -1,6 +1,6 @@
-// Project Title
-// Your Name
-// Date
+// Fish love bubbles
+// Hosain Javadi
+// March 4th, 2025
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
@@ -119,7 +119,7 @@ class Bubble {
   }
   
   display() {
-    fill(173, 216, 230, this.alpha);
+    fill(173, 216, 230, this.alpha); // the fourth option means opacity
     noStroke();
     ellipse(this.x, this.y, this.size);
   }
