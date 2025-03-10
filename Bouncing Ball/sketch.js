@@ -1,11 +1,3 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
-
-
 // Bouncing Ball Object Demo
 
 let ballArray = [];
@@ -19,28 +11,40 @@ function draw() {
   background(220);
 
   for (let ball of ballArray) {
-    //move ball
-    ball.x += ball.dx;
-    ball.y += ball.dy;
-
-    //teleport around edge of screen
-    if (ball.x -ball.radius> width) {
-      ball.x = -ball.radius;
-    }
-    else if (ball.x +ball.radius< 0) {
-      ball.x = +ball.radius;
-    }
-    if (ball.y -ball.radius> height) {
-      ball.y = -ball.radius;
-    }
-    else if (ball.y +ball.radius< 0) {
-      ball.y = +ball.radius;
-    }
-
-    //display ball
-    fill("red");
-    circle(ball.x, ball.y, ball.radius * 2);
+    moveBalls(ball);
+    displayBalls(ball);
   }
+}
+
+function moveBalls(ball) {
+  //move ball
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+
+  //teleport around edge of screen
+  if (ball.x - ball.radius > width) {
+    //off right side
+    ball.x = -ball.radius;
+  }
+  else if (ball.x + ball.radius < 0) {
+    //off left side
+    ball.x = width + ball.radius;
+  }
+  if (ball.y - ball.radius > height) {
+    //off bottom
+    ball.y = -ball.radius;
+  }
+  else if (ball.y + ball.radius < 0) {
+    //off top
+    ball.y = height + ball.radius;
+  }
+}
+
+function displayBalls(ball) {
+  //display ball
+  noStroke();
+  fill("red");
+  circle(ball.x, ball.y, ball.radius * 2);
 }
 
 function mousePressed() {
