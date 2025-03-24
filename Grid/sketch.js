@@ -1,26 +1,21 @@
-// 2d grid demo
+// 2D Array Grid neighbors Demo
 
-// let grid = [[0,1,1,0],
-//             [1,1,0,0],
-//             [0,0,1,1],
-//             [0,1,0,0]];
-
-// const cellSize = 50; // do this for choosing a size for the boxes
 let cellSize;
-const squareDimension=10;
+const SQUARE_DIMENSIONS = 10;
 let grid;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  if (height>width){
-    cellSize = width/squareDimension;
+  //make the largest square that fits
+  if (height > width) {
+    cellSize = width / SQUARE_DIMENSIONS;
   }
-  else{
-    cellSize = height/squareDimension;
+  else {
+    cellSize = height / SQUARE_DIMENSIONS;
   }
 
-  grid=randomGenrateGrid(squareDimension,squareDimension);
+  grid = generateRandomGrid(SQUARE_DIMENSIONS, SQUARE_DIMENSIONS);
 }
 
 function draw() {
@@ -29,41 +24,76 @@ function draw() {
   displayGrid();
 }
 
-function displayGrid(){
-  for (let y =0; y<squareDimension;y++){
-    for (let x=0;x<squareDimension;x++){
-      if (grid[y][x]===0){
-        fill('black');
-      }
-      else if (grid[y][x]===1){
-        fill('white');
-      }
-      rect(x*cellSize,y*cellSize,cellSize,cellSize);
+function mousePressed() {
+  let x = Math.floor(mouseX/cellSize);
+  let y = Math.floor(mouseY/cellSize);
+
+  // self toggle
+  toggleCell(x, y);
+
+  // neighbor toggle
+  toggleCell(x+1, y);
+  toggleCell(x-1, y);
+  toggleCell(x, y+1);
+  toggleCell(x, y-1);
+}
+
+function toggleCell(x, y) {
+  // make sure cell we are toggling is in the grid
+  if (x>=0 && x<SQUARE_DIMENSIONS && y>=0&&y<SQUARE_DIMENSIONS){
+    if (grid[y][x] === 0) {
+      grid[y][x] = 1;
+    }
+    else if (grid[y][x] === 1) {
+      grid[y][x] = 0;
     }
   }
 }
 
-function genrateGrid(cols,rows){
+function keyPressed() {
+  if (key === "r") {
+    grid = generateRandomGrid(SQUARE_DIMENSIONS, SQUARE_DIMENSIONS);
+  }
+  else if (key === "e") {
+    grid = generateGrid(SQUARE_DIMENSIONS, SQUARE_DIMENSIONS);
+  }
+}
+
+function displayGrid() {
+  for (let y = 0; y < SQUARE_DIMENSIONS; y++) {
+    for (let x = 0; x < SQUARE_DIMENSIONS; x++) {
+      if (grid[y][x] === 1) {
+        fill("black");
+      }
+      else if (grid[y][x] === 0) {
+        fill("white");
+      }
+      rect(x * cellSize, y * cellSize, cellSize, cellSize);
+    }
+  }
+}
+
+function generateGrid(cols, rows) {
   let newGrid = [];
-  for (let y=0;y<rows;y++){
+  for (let y = 0; y < rows; y++) {
     newGrid.push([]);
-    for (let x=0;x<cols;x++){
+    for (let x = 0; x < cols; x++) {
       newGrid[y].push(0);
     }
   }
   return newGrid;
 }
 
-function randomGenrateGrid(cols,rows){
+function generateRandomGrid(cols, rows) {
   let newGrid = [];
-  for (let y=0;y<rows;y++){
+  for (let y = 0; y < rows; y++) {
     newGrid.push([]);
-    for (let x=0;x<cols;x++){
-      if (random(100)<50){
-        newGrid[y].pudh(1);
+    for (let x = 0; x < cols; x++) {
+      if (random(100) < 50) {
+        newGrid[y].push(0);
       }
       else {
-        newGrid[y].push(0);
+        newGrid[y].push(1);
       }
     }
   }
