@@ -5,3 +5,5 @@
 -[Bubble object notation](bubbles)
 -[FPS GAME](game-2)
 -[2D Array Grid](Grid)
+-[Rectangle Grid](Rectangle-Grid)
+-[Game of Life](Game-of-life)
