@@ -1,19 +1,416 @@
-// Project Title
-// Your Name
-// Date
+// Block Puzzle Game - Drag and Drop
+// Endless Game Until No Valid Moves
+// Hosain Javadi
+// April 5th, 2025
 //
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// Extra for Expert:
+// I have added HTML Div to the code for Game Over pop up window. I hav added a 
+
 let grid;
+const gridSize = 9;
+let cellSize;
+let shapes = [];
+let currentPieces = [];
+let score = 0;
+let clearingEffects = [];
+let gridOffsetX, gridOffsetY;
+let darkMode = false;
+let toggleButton;
+let gameOverDiv;
+let gameIsOver = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  cellSize = min(width, height) / (gridSize + 6);
+  gridOffsetX = (width - gridSize * cellSize) / 2;
+  gridOffsetY = (height - gridSize * cellSize) / 2 - cellSize;
+  grid = createEmptyGrid();
+  generateNewPieces();
+
+  toggleButton = createButton("Toggle Theme");
+  toggleButton.position(20, 60);
+  toggleButton.mousePressed(() => {
+    darkMode = !darkMode;
+  });
+
+  gameOverDiv = createDiv(`
+    <div style="
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      padding: 40px;
+      border-radius: 12px;
+      width: 300px;
+      margin: 0 auto;
+    ">
+      <p>Game Over! Final Score: <span id="final-score"></span></p>
+      <button id="restart-btn" style="
+        padding: 10px 20px;
+        font-size: 18px;
+        margin-top: 20px;
+        cursor: pointer;
+      ">Restart</button>
+    </div>
+  `);
+  gameOverDiv.position((windowWidth - 300) / 2, (windowHeight - 200) / 2);
+  gameOverDiv.hide();
 }
 
 function draw() {
-  background(220);
+  background(darkMode ? 30 : 240);
+  drawScore();
+  drawGrid();
+  drawEffects();
+  drawPieces();
+
+  if (!gameIsOver && !anyValidMoves()) {
+    gameIsOver = true;
+    noLoop();
+    select("#final-score").html(score);
+    gameOverDiv.show();
+
+    select("#restart-btn").mousePressed(() => {
+      location.reload();
+    });
+  }
 }
 
-function displayGrid(){
-  
+function createEmptyGrid() {
+  let g = [];
+  for (let y = 0; y < gridSize; y++) {
+    g[y] = [];
+    for (let x = 0; x < gridSize; x++) {
+      g[y][x] = 0;
+    }
+  }
+  return g;
+}
+
+function drawGrid() {
+  stroke(180);
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      if (grid[y][x] === 1) {
+        fill(lerpColor(color(255), color(80, 180, 255), 0.6));
+      } 
+      else {
+        fill(darkMode ? 50 : 255);
+      }
+      rect(gridOffsetX + x * cellSize, gridOffsetY + y * cellSize, cellSize, cellSize);
+    }
+  }
+}
+
+function drawScore() {
+  fill(darkMode ? 255 : 0);
+  textSize(24);
+  textAlign(LEFT, TOP);
+  text("Score: " + score, 20, 20);
+}
+
+function drawPieces() {
+  for (let piece of currentPieces) {
+    piece.display();
+  }
+}
+
+function drawEffects() {
+  for (let i = clearingEffects.length - 1; i >= 0; i--) {
+    let effect = clearingEffects[i];
+    effect.alpha -= 10;
+    if (effect.alpha <= 0) {
+      clearingEffects.splice(i, 1);
+      continue;
+    }
+    fill(255, 255, 0, effect.alpha);
+    noStroke();
+    rect(gridOffsetX + effect.x * cellSize, gridOffsetY + effect.y * cellSize, cellSize, cellSize);
+  }
+}
+
+function mousePressed() {
+  if (gameIsOver) {
+    return;
+  }
+  for (let piece of currentPieces) {
+    piece.startDrag(mouseX, mouseY);
+  }
+}
+
+function mouseDragged() {
+  if (gameIsOver) {
+    return;
+  }
+  for (let piece of currentPieces) {
+    piece.drag(mouseX, mouseY);
+  }
+}
+
+function mouseReleased() {
+  if (gameIsOver) {
+    return;
+  }
+  for (let i = currentPieces.length - 1; i >= 0; i--) {
+    if (currentPieces[i].drop(grid, cellSize)) {
+      currentPieces.splice(i, 1);
+      checkLines();
+    }
+  }
+
+  if (currentPieces.length === 0) {
+    generateNewPieces();
+  }
+}
+
+function checkLines() {
+  let toClearRows = [];
+  let toClearCols = [];
+
+  for (let y = 0; y < gridSize; y++) {
+    if (grid[y].every(cell => cell === 1)) {
+      toClearRows.push(y);
+    }
+  }
+
+  for (let x = 0; x < gridSize; x++) {
+    let full = true;
+    for (let y = 0; y < gridSize; y++) {
+      if (grid[y][x] === 0) {
+        full = false;
+      }
+    }
+    if (full) {
+      toClearCols.push(x);
+    }
+  }
+
+  for (let y of toClearRows) {
+    for (let x = 0; x < gridSize; x++) {
+      grid[y][x] = 0;
+      score++;
+      clearingEffects.push({ x: x, y: y, alpha: 255 });
+    }
+  }
+
+  for (let x of toClearCols) {
+    for (let y = 0; y < gridSize; y++) {
+      grid[y][x] = 0;
+      score++;
+      clearingEffects.push({ x: x, y: y, alpha: 255 });
+    }
+  }
+}
+
+function generateNewPieces() {
+  currentPieces = [];
+  const spacing = cellSize * (gridSize / 3);
+  const startX = gridOffsetX + (cellSize * gridSize - spacing * 2) / 2;
+  const baseY = gridOffsetY + cellSize * gridSize + cellSize;
+
+  for (let i = 0; i < 3; i++) {
+    let shape = randomShape();
+    let pieceX = startX + i * spacing;
+    let pieceY = baseY;
+    currentPieces.push(new Block(shape, pieceX, pieceY));
+  }
+}
+
+function anyValidMoves() {
+  for (let piece of currentPieces) {
+    const originalShape = piece.shape;
+
+    for (let r = 0; r < 4; r++) {
+      if (piece.canFit(grid)) {
+        return true;
+      }
+      const oldShape = piece.shape;
+      const rows = oldShape.length;
+      const cols = oldShape[0].length;
+      const newShape = [];
+      for (let x = 0; x < cols; x++) {
+        newShape[x] = [];
+        for (let y = rows - 1; y >= 0; y--) {
+          newShape[x][rows - 1 - y] = oldShape[y][x];
+        }
+      }
+      piece.shape = newShape;
+    }
+    piece.shape = originalShape;
+  }
+  return false;
+}
+
+function randomShape() {
+  const shapeTemplates = [
+    [[1, 1], [1, 1]],
+    [[1, 0], [1, 1]],
+    [[1, 1, 1], [0, 1, 0]],
+    [[1, 1, 1]],
+    [[1], [1], [1], [1]],
+    [[1, 1, 1, 1, 1]],
+    [[1], [1], [1], [1], [1]],
+    [[1, 1, 1], [1, 0, 0]],
+    [[1, 1], [0, 1]],
+    [[1, 0], [0, 1]]
+  ];
+  return random(shapeTemplates);
+}
+
+class Block {
+  constructor(shape, x, y) {
+    this.shape = shape;
+    this.x = x;
+    this.y = y;
+    this.dragging = false;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.color = color(random(180, 255), random(180, 255), random(180, 255));
+    this.currentAngle = 0;
+    this.targetAngle = 0;
+    this.rotationQueue = [];
+    this.rotationCount = 0;
+  }
+
+  display() {
+    push();
+    translate(this.x + this.getWidth() / 2, this.y + this.getHeight() / 2);
+    rotate(this.currentAngle);
+    translate(-this.getWidth() / 2, -this.getHeight() / 2);
+
+    fill(this.color);
+    stroke(darkMode ? 20 : 200);
+    strokeWeight(1);
+    for (let row = 0; row < this.shape.length; row++) {
+      for (let col = 0; col < this.shape[0].length; col++) {
+        if (this.shape[row][col]) {
+          rect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+    pop();
+
+    if (abs(this.targetAngle - this.currentAngle) > 0.01) {
+      this.currentAngle = lerp(this.currentAngle, this.targetAngle, 0.2);
+    } 
+    else {
+      this.currentAngle = this.targetAngle;
+      if (this.rotationQueue.length > 0) {
+        const apply = this.rotationQueue.shift();
+        apply();
+        this.currentAngle = 0;
+        this.targetAngle = 0;
+      }
+    }
+  }
+
+  rotate() {
+    if (this.rotationQueue.length === 0 && this.currentAngle === this.targetAngle) {
+      this.targetAngle += HALF_PI;
+      const oldShape = this.shape;
+      this.rotationQueue.push(() => {
+        const newShape = [];
+        const rows = oldShape.length;
+        const cols = oldShape[0].length;
+        for (let x = 0; x < cols; x++) {
+          newShape[x] = [];
+          for (let y = rows - 1; y >= 0; y--) {
+            newShape[x][rows - 1 - y] = oldShape[y][x];
+          }
+        }
+        this.shape = newShape;
+      });
+    }
+  }
+
+  startDrag(mx, my) {
+    if (this.isMouseOver(mx, my)) {
+      this.dragging = true;
+      this.offsetX = mx - this.x;
+      this.offsetY = my - this.y;
+    }
+  }
+
+  drag(mx, my) {
+    if (this.dragging) {
+      this.x = mx - this.offsetX;
+      this.y = my - this.offsetY;
+    }
+  }
+
+  drop(grid, cellSize) {
+    if (!this.dragging) {
+      return false;
+    }
+    this.dragging = false;
+
+    let gx = Math.round((this.x - gridOffsetX) / cellSize);
+    let gy = Math.round((this.y - gridOffsetY) / cellSize);
+
+    if (this.canPlaceAt(grid, gx, gy)) {
+      for (let row = 0; row < this.shape.length; row++) {
+        for (let col = 0; col < this.shape[0].length; col++) {
+          if (this.shape[row][col]) {
+            grid[gy + row][gx + col] = 1;
+          }
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  canPlaceAt(grid, gx, gy) {
+    for (let row = 0; row < this.shape.length; row++) {
+      for (let col = 0; col < this.shape[0].length; col++) {
+        if (this.shape[row][col]) {
+          if (gy + row < 0 || gy + row >= gridSize || gx + col < 0 || gx + col >= gridSize) {
+            return false;
+          }
+          if (grid[gy + row][gx + col] === 1) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  canFit(grid) {
+    for (let y = 0; y <= gridSize - this.shape.length; y++) {
+      for (let x = 0; x <= gridSize - this.shape[0].length; x++) {
+        if (this.canPlaceAt(grid, x, y)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  isMouseOver(mx, my) {
+    return mx > this.x && mx < this.x + this.shape[0].length * cellSize &&
+           my > this.y && my < this.y + this.shape.length * cellSize;
+  }
+
+  getWidth() {
+    return this.shape[0].length * cellSize;
+  }
+
+  getHeight() {
+    return this.shape.length * cellSize;
+  }
+}
+
+function keyPressed() {
+  if (gameIsOver) {
+    return;
+  }
+  if (key === 'r' || key === 'R') {
+    for (let piece of currentPieces) {
+      if (piece.dragging || piece.isMouseOver(mouseX, mouseY)) {
+        piece.rotate();
+        break;
+      }
+    }
+  }
 }
