@@ -6,28 +6,28 @@
 // Extra for Expert:
 // I have added HTML Div to the code for Game Over pop up window. I hav added a 
 
-let grid;
-const gridSize = 9;
-let cellSize;
-let shapes = [];
-let currentPieces = [];
-let score = 0;
-let clearingEffects = [];
-let gridOffsetX, gridOffsetY;
-let darkMode = false;
-let toggleButton;
-let gameOverDiv;
-let gameIsOver = false;
+let grid; //initializing the gird
+const gridSize = 9; // how many square the grid contains
+let cellSize;  // cell size
+let shapes = []; // an array to store(push) the shapes to generate.
+let currentPieces = []; // an array to store what shapes have been generated for the player
+let score = 0; // score
+let clearingEffects = []; // an array that store animation information into it
+let gridOffsetX, gridOffsetY; // to put the grid at the center of the web page
+let darkMode = false; // var to check the dark mode
+let toggleButton; // var for button of Light Dark Mode 
+let gameOverDiv; // var for Game Over pop up window
+let gameIsOver = false; // var to check if the game is over or not
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  cellSize = min(width, height) / (gridSize + 6);
-  gridOffsetX = (width - gridSize * cellSize) / 2;
-  gridOffsetY = (height - gridSize * cellSize) / 2 - cellSize;
-  grid = createEmptyGrid();
+  cellSize = min(width, height) / (gridSize + 6); // calculating the cell size
+  gridOffsetX = (width - gridSize * cellSize) / 2; // putting the grid horizontally at the center
+  gridOffsetY = (height - gridSize * cellSize) / 2 - cellSize; // putting the grid vertically at the center(slightly upwards)
+  grid = createEmptyGrid(); // making a base grid
   generateNewPieces();
 
-  toggleButton = createButton("Toggle Theme");
+  toggleButton = createButton("Light/Dark MODE");
   toggleButton.position(20, 60);
   toggleButton.mousePressed(() => {
     darkMode = !darkMode;
