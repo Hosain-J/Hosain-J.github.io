@@ -27,12 +27,14 @@ function setup() {
   grid = createEmptyGrid(); // making a base grid
   generateNewPieces();
 
-  toggleButton = createButton("Light/Dark MODE");
-  toggleButton.position(20, 60);
+  toggleButton = createButton("Light/Dark MODE"); // Create a button to toggle
+  toggleButton.position(20, 60); // place the button on cthe page
+  // when the button is preesed inverts dark mode
   toggleButton.mousePressed(() => {
     darkMode = !darkMode;
   });
 
+  // Create the GameOver popup window using HTML and adding a button to refresh the page
   gameOverDiv = createDiv(`
     <div style="
       background: rgba(0, 0, 0, 0.8);
@@ -53,31 +55,34 @@ function setup() {
       ">Restart</button>
     </div>
   `);
+  // place the the popup window at the center
   gameOverDiv.position((windowWidth - 300) / 2, (windowHeight - 200) / 2);
-  gameOverDiv.hide();
+  gameOverDiv.hide(); // hide the window unless the game is over
 }
 
 function draw() {
-  background(darkMode ? 30 : 240);
+  background(darkMode ? 30 : 240); // set the color based on dark mode, using ternary
+  // calling functions
   drawScore();
   drawGrid();
   drawEffects();
   drawPieces();
 
+  // check if the game is over
   if (!gameIsOver && !anyValidMoves()) {
     gameIsOver = true;
     noLoop();
-    select("#final-score").html(score);
-    gameOverDiv.show();
+    select("#final-score").html(score); // update the score on html popup wiindow
+    gameOverDiv.show(); // dispaly the window
 
     select("#restart-btn").mousePressed(() => {
-      location.reload();
+      location.reload(); // refresh the webpage
     });
   }
 }
 
 function createEmptyGrid() {
-  let g = [];
+  let g = []; // empty array and make the grid
   for (let y = 0; y < gridSize; y++) {
     g[y] = [];
     for (let x = 0; x < gridSize; x++) {
@@ -88,34 +93,35 @@ function createEmptyGrid() {
 }
 
 function drawGrid() {
-  stroke(180);
+  stroke(180); // border
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
-      if (grid[y][x] === 1) {
+      if (grid[y][x] === 1) { // if full light blue, using lerpcolor() to blend white and blue colors
         fill(lerpColor(color(255), color(80, 180, 255), 0.6));
       } 
-      else {
+      else {// if empty white or dark grey based on dark mode
         fill(darkMode ? 50 : 255);
       }
+      // make the rects for each cell
       rect(gridOffsetX + x * cellSize, gridOffsetY + y * cellSize, cellSize, cellSize);
     }
   }
 }
 
 function drawScore() {
-  fill(darkMode ? 255 : 0);
+  fill(darkMode ? 255 : 0); // again ternary, text modification based on dark mode
   textSize(24);
   textAlign(LEFT, TOP);
   text("Score: " + score, 20, 20);
 }
 
-function drawPieces() {
+function drawPieces() { // loops through each piece to call its display function
   for (let piece of currentPieces) {
     piece.display();
   }
 }
 
-function drawEffects() {
+function drawEffects() { // loop through the clearingEffect array backwards for the index efficiancy. the function make a yellow cells for the rows or columns that have been cleared. just make the game fancier
   for (let i = clearingEffects.length - 1; i >= 0; i--) {
     let effect = clearingEffects[i];
     effect.alpha -= 10;
@@ -125,20 +131,20 @@ function drawEffects() {
     }
     fill(255, 255, 0, effect.alpha);
     noStroke();
-    rect(gridOffsetX + effect.x * cellSize, gridOffsetY + effect.y * cellSize, cellSize, cellSize);
+    rect(gridOffsetX + effect.x * cellSize, gridOffsetY + effect.y * cellSize, cellSize, cellSize); //make the rects in the position where the rects have to get cleared
   }
 }
 
-function mousePressed() {
+function mousePressed() { // mouse clicking event
   if (gameIsOver) {
     return;
   }
   for (let piece of currentPieces) {
-    piece.startDrag(mouseX, mouseY);
+    piece.startDrag(mouseX, mouseY); // call the function for dragging the blocks
   }
 }
 
-function mouseDragged() {
+function mouseDragged() { // if the mouse moves the blocks follow
   if (gameIsOver) {
     return;
   }
@@ -414,3 +420,7 @@ function keyPressed() {
     }
   }
 }
+
+// function windowResized(){
+//   resizeCanvas(windowWidth,windowHeight);
+// }
