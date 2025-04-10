@@ -21,9 +21,9 @@ let gameIsOver=false; // var to check if the game is over or not
 
 function setup() {
   createCanvas(windowWidth,windowHeight);
-  cellSize=min(width,height) / (gridSize + 6); // calculating the cell size
-  gridOffsetX=(width - gridSize * cellSize) / 2; // putting the grid horizontally at the center
-  gridOffsetY=(height - gridSize * cellSize) / 2 - cellSize; // putting the grid vertically at the center(slightly upwards)
+  cellSize=min(width,height)/(gridSize + 6); // calculating the cell size
+  gridOffsetX=(width - gridSize*cellSize)/2; // putting the grid horizontally at the center
+  gridOffsetY=(height - gridSize*cellSize)/2 - cellSize; // putting the grid vertically at the center(slightly upwards)
   grid=createEmptyGrid(); // making a base grid
   generateNewPieces();
 
@@ -56,7 +56,7 @@ function setup() {
     </div>
   `);
   // place the the popup window at the center
-  gameOverDiv.position((windowWidth - 300) / 2,(windowHeight - 200) / 2);
+  gameOverDiv.position((windowWidth - 300)/2,(windowHeight - 200)/2);
   gameOverDiv.hide(); // hide the window unless the game is over
 }
 
@@ -67,6 +67,7 @@ function draw() {
   drawGrid();
   drawEffects();
   drawPieces();
+  drawInstruction();
 
   // check if the game is over
   if (!gameIsOver && !anyValidMoves()) {
@@ -83,9 +84,9 @@ function draw() {
 
 function createEmptyGrid() {
   let g=[]; // empty array and make the grid
-  for (let y=0; y < gridSize; y++) {
+  for (let y=0; y<gridSize; y++) {
     g[y]=[];
-    for (let x=0; x < gridSize; x++) {
+    for (let x=0; x<gridSize; x++) {
       g[y][x]=0;
     }
   }
@@ -94,8 +95,8 @@ function createEmptyGrid() {
 
 function drawGrid() {
   stroke(180); // border
-  for (let y=0; y < gridSize; y++) {
-    for (let x=0; x < gridSize; x++) {
+  for (let y=0; y<gridSize; y++) {
+    for (let x=0; x<gridSize; x++) {
       if (grid[y][x] === 1) { // if full light blue,using lerpcolor() to blend white and blue colors
         fill(lerpColor(color(255),color(80,180,255),0.6));
       } 
@@ -103,9 +104,16 @@ function drawGrid() {
         fill(darkMode ? 50 : 255);
       }
       // make the rects for each cell
-      rect(gridOffsetX + x * cellSize,gridOffsetY + y * cellSize,cellSize,cellSize);
+      rect(gridOffsetX + x*cellSize,gridOffsetY + y*cellSize,cellSize,cellSize);
     }
   }
+}
+
+function drawInstruction(){
+  fill(darkMode ? 255:0); //ternary, text modification
+  textSize(16);
+  textAlign(LEFT,BOTTOM);
+  text('Use R key to rotate the pieces while pressing on it',20,height-40);
 }
 
 function drawScore() {
@@ -131,7 +139,7 @@ function drawEffects() { // loop through the clearingEffect array backwards for 
     }
     fill(255,255,0,effect.alpha);
     noStroke();
-    rect(gridOffsetX + effect.x * cellSize,gridOffsetY + effect.y * cellSize,cellSize,cellSize); //make the rects in the position where the rects have to get cleared
+    rect(gridOffsetX + effect.x*cellSize,gridOffsetY + effect.y*cellSize,cellSize,cellSize); //make the rects in the position where the rects have to get cleared
   }
 }
 
@@ -173,15 +181,15 @@ function checkLines() { // check for clearing rows or columns,the func make two 
   let toClearRows=[];
   let toClearCols=[];
 
-  for (let y=0; y < gridSize; y++) {
+  for (let y=0; y<gridSize; y++) {
     if (grid[y].every(cell => cell === 1)) {
       toClearRows.push(y);
     }
   }
 
-  for (let x=0; x < gridSize; x++) {
+  for (let x=0; x<gridSize; x++) {
     let full=true;
-    for (let y=0; y < gridSize; y++) {
+    for (let y=0; y<gridSize; y++) {
       if (grid[y][x] === 0) {
         full=false;
       }
@@ -192,7 +200,7 @@ function checkLines() { // check for clearing rows or columns,the func make two 
   }
 
   for (let y of toClearRows) {
-    for (let x=0; x < gridSize; x++) {
+    for (let x=0; x<gridSize; x++) {
       grid[y][x]=0;
       score++;
       clearingEffects.push({ x: x,y: y,alpha: 255 });
@@ -200,7 +208,7 @@ function checkLines() { // check for clearing rows or columns,the func make two 
   }
 
   for (let x of toClearCols) {
-    for (let y=0; y < gridSize; y++) {
+    for (let y=0; y<gridSize; y++) {
       grid[y][x]=0;
       score++;
       clearingEffects.push({ x: x,y: y,alpha: 255 });
@@ -211,13 +219,15 @@ function checkLines() { // check for clearing rows or columns,the func make two 
 function generateNewPieces() { // generating blocks
   currentPieces=[];
   // block size modification
-  const spacing=cellSize * (gridSize / 3);
-  const startX=gridOffsetX + (cellSize * gridSize - spacing * 2) / 2;
-  const baseY=gridOffsetY + cellSize * gridSize + cellSize;
+  const spacing=cellSize*(gridSize/3);
+  const extraMargin=cellSize*0.2;
+  const totalWidth=spacing*3+extraMargin*2;
+  const startX=gridOffsetX + (cellSize*gridSize - totalWidth)/2;
+  const baseY=gridOffsetY + cellSize*gridSize + cellSize;
 
-  for (let i=0; i < 3; i++) { // it pushes the new blocks to the current peices set
+  for (let i=0; i<3; i++) { // it pushes the new blocks to the current peices set
     let shape=randomShape();
-    let pieceX=startX + i * spacing;
+    let pieceX=startX + i*spacing+i*extraMargin;
     let pieceY=baseY;
     currentPieces.push(new Block(shape,pieceX,pieceY));
   }
@@ -227,7 +237,7 @@ function anyValidMoves() { // the function checks if there is anymore space for 
   for (let piece of currentPieces) {
     const originalShape=piece.shape;
 
-    for (let r=0; r < 4; r++) {
+    for (let r=0; r<4; r++) {
       if (piece.canFit(grid)) {
         return true;
       }
@@ -235,7 +245,7 @@ function anyValidMoves() { // the function checks if there is anymore space for 
       const rows=oldShape.length;
       const cols=oldShape[0].length;
       const newShape=[];
-      for (let x=0; x < cols; x++) {
+      for (let x=0; x<cols; x++) {
         newShape[x]=[];
         for (let y=rows - 1; y >= 0; y--) {
           newShape[x][rows - 1 - y]=oldShape[y][x];
@@ -249,7 +259,7 @@ function anyValidMoves() { // the function checks if there is anymore space for 
 }
 
 function randomShape() {
-  const shapeTemplates=[
+  const shapeTemplates=[ // defines the blockes like L T shapes
     [[1,1,1],[0,1,0],[0,1,0]],
     [[1,1],[1,1]],
     [[1,0],[1,1]],
@@ -263,7 +273,7 @@ function randomShape() {
   return random(shapeTemplates);
 }
 
-class Block {
+class Block { // initialize the block variable
   constructor(shape,x,y) {
     this.shape=shape;
     this.x=x;
@@ -272,36 +282,36 @@ class Block {
     this.offsetX=0;
     this.offsetY=0;
     this.color=color(random(180,255),random(180,255),random(180,255));
-    this.currentAngle=0;
+    this.currentAngle=0; // vars for rotation
     this.targetAngle=0;
     this.rotationQueue=[];
     this.rotationCount=0;
   }
 
   display() {
-    push();
-    translate(this.x + this.getWidth() / 2,this.y + this.getHeight() / 2);
-    rotate(this.currentAngle);
-    translate(-this.getWidth() / 2,-this.getHeight() / 2);
+    push(); // saves the current draing state
+    translate(this.x + this.getWidth()/2,this.y + this.getHeight()/2); // translate to center of the block to prepare for rotation
+    rotate(this.currentAngle); // rotate
+    translate(-this.getWidth()/2,-this.getHeight()/2); // translate half back to origin for animation
 
     fill(this.color);
     stroke(darkMode ? 20 : 200);
     strokeWeight(1);
-    for (let row=0; row < this.shape.length; row++) {
-      for (let col=0; col < this.shape[0].length; col++) {
+    for (let row=0; row<this.shape.length; row++) { // draws the shapes
+      for (let col=0; col<this.shape[0].length; col++) {
         if (this.shape[row][col]) {
-          rect(col * cellSize,row * cellSize,cellSize,cellSize);
+          rect(col*cellSize,row*cellSize,cellSize,cellSize);
         }
       }
     }
-    pop();
+    pop(); // restore the pervious drawing state
 
-    if (abs(this.targetAngle - this.currentAngle)>0.01) {
+    if (abs(this.targetAngle - this.currentAngle)>0.01) { // using linear interpolation, animates the rotates
       this.currentAngle=lerp(this.currentAngle,this.targetAngle,0.2);
     } 
     else {
-      this.currentAngle=this.targetAngle;
-      if (this.rotationQueue.length>0) {
+      this.currentAngle=this.targetAngle; // it rotates till it equals the target angle
+      if (this.rotationQueue.length>0) { // just if you double pressed r it counts it to rotate after the forst rotation
         const apply=this.rotationQueue.shift();
         apply();
         this.currentAngle=0;
@@ -310,7 +320,7 @@ class Block {
     }
   }
 
-  rotate() {
+  rotate() { // 900 dgree rotation, make new arrays to store old and new shapes and change the shape for accurate visualization
     if (this.rotationQueue.length === 0 && this.currentAngle === this.targetAngle) {
       this.targetAngle += HALF_PI;
       const oldShape=this.shape;
@@ -318,7 +328,7 @@ class Block {
         const newShape=[];
         const rows=oldShape.length;
         const cols=oldShape[0].length;
-        for (let x=0; x < cols; x++) {
+        for (let x=0; x<cols; x++) {
           newShape[x]=[];
           for (let y=rows - 1; y >= 0; y--) {
             newShape[x][rows - 1 - y]=oldShape[y][x];
@@ -329,7 +339,7 @@ class Block {
     }
   }
 
-  startDrag(mx,my) {
+  startDrag(mx,my) { // for dragging pieces
     if (this.isMouseOver(mx,my)) {
       this.dragging=true;
       this.offsetX=mx - this.x;
@@ -337,25 +347,25 @@ class Block {
     }
   }
 
-  drag(mx,my) {
+  drag(mx,my) { // dragging the peices
     if (this.dragging) {
       this.x=mx - this.offsetX;
       this.y=my - this.offsetY;
     }
   }
 
-  drop(grid,cellSize) {
+  drop(grid,cellSize) { // to drop the piece into the grid(nearest cells available)
     if (!this.dragging) {
       return false;
     }
     this.dragging=false;
 
-    let gx=Math.round((this.x - gridOffsetX) / cellSize);
-    let gy=Math.round((this.y - gridOffsetY) / cellSize);
+    let gx=Math.round((this.x - gridOffsetX)/cellSize); // calculate grid and piece coordinates for if they match
+    let gy=Math.round((this.y - gridOffsetY)/cellSize);
 
     if (this.canPlaceAt(grid,gx,gy)) {
-      for (let row=0; row < this.shape.length; row++) {
-        for (let col=0; col < this.shape[0].length; col++) {
+      for (let row=0; row<this.shape.length; row++) {
+        for (let col=0; col<this.shape[0].length; col++) {
           if (this.shape[row][col]) {
             grid[gy + row][gx + col]=1;
           }
@@ -366,11 +376,11 @@ class Block {
     return false;
   }
 
-  canPlaceAt(grid,gx,gy) {
-    for (let row=0; row < this.shape.length; row++) {
-      for (let col=0; col < this.shape[0].length; col++) {
+  canPlaceAt(grid,gx,gy) { // if piece match (no overlay or extend) in the grid
+    for (let row=0; row<this.shape.length; row++) {
+      for (let col=0; col<this.shape[0].length; col++) {
         if (this.shape[row][col]) {
-          if (gy + row < 0 || gy + row >= gridSize || gx + col < 0 || gx + col >= gridSize) {
+          if (gy + row<0 || gy + row >= gridSize || gx + col<0 || gx + col >= gridSize) {
             return false;
           }
           if (grid[gy + row][gx + col] === 1) {
@@ -379,10 +389,10 @@ class Block {
         }
       }
     }
-    return true;
+    return true; // return true if all the blocks in piece fit in the grid
   }
 
-  canFit(grid) {
+  canFit(grid) { // This is to check if there is a valid move it check if the piece can fit anywhere in the grid
     for (let y=0; y <= gridSize - this.shape.length; y++) {
       for (let x=0; x <= gridSize - this.shape[0].length; x++) {
         if (this.canPlaceAt(grid,x,y)) {
@@ -393,21 +403,21 @@ class Block {
     return false;
   }
 
-  isMouseOver(mx,my) {
-    return mx>this.x && mx < this.x + this.shape[0].length * cellSize &&
-           my>this.y && my < this.y + this.shape.length * cellSize;
+  isMouseOver(mx,my) { // checks if the crosshair in on the pieces
+    return mx>this.x && mx<this.x + this.shape[0].length*cellSize &&
+           my>this.y && my<this.y + this.shape.length*cellSize;
   }
 
-  getWidth() {
-    return this.shape[0].length * cellSize;
+  getWidth() { // for block size
+    return this.shape[0].length*cellSize;
   }
 
-  getHeight() {
-    return this.shape.length * cellSize;
+  getHeight() { // for block size
+    return this.shape.length*cellSize;
   }
 }
 
-function keyPressed() {
+function keyPressed() { // for rotation pressing r
   if (gameIsOver) {
     return;
   }
@@ -421,6 +431,22 @@ function keyPressed() {
   }
 }
 
-// function windowResized(){
-//   resizeCanvas(windowWidth,windowHeight);
-// }
+function windowResized(){ // it resizes everything(grid annd pieces) when window is resized
+  resizeCanvas(windowWidth,windowHeight);
+  cellSize=min(windowWidth, windowHeight)/(gridSize+6);
+
+  gridOffsetX=(windowWidth-gridSize*cellSize)/2;
+  gridOffsetY=(windowHeight-gridSize*cellSize)/2-cellSize;
+
+  gameOverDiv.position((windowWidth-300)/2,(windowHeight-200)/2);
+
+  const spacing=cellSize*(gridSize/3);
+  const startX=gridOffsetX+(cellSize*gridSize-spacing*2)/2;
+  const baseY=gridOffsetY+cellSize*gridSize+cellSize;
+
+  for (let i=0;i<currentPieces.length;i++){
+    let peice=currentPieces[i];
+    peice.x=startX+i*spacing;
+    peice.y=baseY;
+  }
+}
