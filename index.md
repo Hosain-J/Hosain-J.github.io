@@ -5,6 +5,7 @@
 -[FPS GAME](game-2)
 -[2D Array Grid](Grid)
 -[Rectangle Grid](Rectangle-Grid)
+-[Walker](Walker)
 
 # CS30 Projects
 -[CS30 project 1](game-1)
