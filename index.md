@@ -6,6 +6,7 @@
 -[2D Array Grid](Grid)
 -[Rectangle Grid](Rectangle-Grid)
 -[Walker](Walker)
+-[Fire Works](FireWorks)
 
 # CS30 Projects
 -[CS30 project 1](game-1)
