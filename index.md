@@ -7,6 +7,7 @@
 -[Rectangle Grid](Rectangle-Grid)
 -[Walker](Walker)
 -[Fire Works](FireWorks)
+-[Coonnected Nodes](nodes)
 
 # CS30 Projects
 -[CS30 project 1](game-1)
