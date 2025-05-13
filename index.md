@@ -15,3 +15,6 @@
 -[CS30 project 1](game-1)
 -[Game of Life](Game-of-life)
 -[Grid-Based Game](Grid_Based_Game)
+
+# CS30 Personal Projects
+-[User Map Generator](map-maker)
