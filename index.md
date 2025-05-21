@@ -10,6 +10,7 @@
 -[Coonnected Nodes](nodes)
 -[local storage](local)
 -[platformer game tries](pgt)
+-[inheretance](inheretance)
 
 # CS30 Projects
 -[CS30 project 1](game-1)
@@ -18,3 +19,4 @@
 
 # CS30 Personal Projects
 -[User Map Generator](map-maker)
+-[Map Loader](mapLoader)
