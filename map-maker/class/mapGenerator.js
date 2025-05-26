@@ -17,7 +17,7 @@ class MapGenerator {
 
     // build two asset lists
     this.BACKGROUNDS  = Array.from({ length: bgCount }, (_, i) =>
-      `blocks/background_walls/bg${i+1}.png`
+      `blocks/backgroundWalls/bg${i+1}.png`
     );
     this.WALLS        = Array.from({ length: wallCount }, (_, i) =>
       `blocks/walls/wa${i+1}.png`

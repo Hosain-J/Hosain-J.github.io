@@ -1,8 +1,11 @@
-// class/King.js
+const GRAVITY = 0.4;
+const MAX_FALL_SPEED = 8;
 
 class King {
   constructor() {
     this.isJumping = false;
+    this.hitBox    = null;
+    this.spi       = null;
   }
 
   pre() {
@@ -11,7 +14,7 @@ class King {
     this.spi    = new Sprite(0, 0, 78, 58);
 
     // Assign spritesheet and animations
-    this.spi.spriteSheet = 'assets/king_human_full.png';
+    this.spi.spriteSheet = 'asset/king_human_full.png';
     this.spi.addAnis({
       attack:  { row: 0, frames: 3,  frameDelay: 6  },
       dead:    { row: 1, frames: 4             },
@@ -25,10 +28,10 @@ class King {
       run:     { row: 9, frames: 8             }
     });
     this.spi.changeAni('idle');
-    this.spi.anis.offset.y = 15;
+    this.spi.anis.offset.y = 10;
     this.spi.rotationLock  = true;
     this.spi.collider      = 'NONE';
-    this.spi.scale         = 1.7;
+    
 
     this.hitBox.rotationLock = true;
     this.hitBox.visible      = false;
@@ -43,16 +46,16 @@ class King {
     const offsetX = (width  - gridW) / 2;
     const offsetY = (height - gridH) / 2;
 
-    // put hitBox in the exact center
     this.hitBox.position.x = offsetX + gridW/2;
     this.hitBox.position.y = offsetY + gridH/2;
     this.isJumping = false;
   }
 
   handleInput() {
-    // Horizontal
+  // Horizontal movement
     if (keyIsDown(RIGHT_ARROW)) {
       this.hitBox.vel.x = 6;
+      this.hitBox.mirror.x = false;
       this.spi.mirror.x = false;
       this.spi.changeAni('run');
     }
@@ -66,13 +69,21 @@ class King {
       this.spi.changeAni('idle');
     }
 
-    // Jump
+    // Jumping
     if (keyIsDown(UP_ARROW) && !this.isJumping) {
-      this.hitBox.vel.y = -6;
+      this.hitBox.vel.y = -7; // jump strength
       this.isJumping = true;
     }
 
-    // Aerial animations
+    // Apply gravity
+    this.hitBox.vel.y += GRAVITY;
+
+    // Limit fall speed
+    if (this.hitBox.vel.y > MAX_FALL_SPEED) {
+      this.hitBox.vel.y = MAX_FALL_SPEED;
+    }
+
+    // Animations
     if (this.hitBox.vel.y < 0) {
       this.spi.changeAni('jump');
     }
@@ -80,9 +91,10 @@ class King {
       this.spi.changeAni('fall');
     }
 
-    // Ground collision resets jump
+    // Ground collision
     if (this.hitBox.collides(walls)) {
       this.isJumping = false;
+      this.hitBox.vel.y = 0;
       this.spi.changeAni('idle');
     }
 
@@ -91,21 +103,31 @@ class King {
       this.spi.changeAni('attack');
     }
 
-    // Sync sprite to hitBox
-    this.spi.position.x = this.hitBox.position.x + (this.spi.mirror.x ? -18 : 18);
-    this.spi.position.y = this.hitBox.position.y - 24;
-
-    // Optional: hold mouse to show debug boxes
     if (mouseIsPressed) {
       allSprites.debug = true;
     }
+
+    this.hitBox.visible = false;
+
+    // Sprite follows hitbox
+    if (this.spi.mirror.x) {
+      this.spi.position.x = this.hitBox.position.x - 18;
+      this.spi.position.y = this.hitBox.position.y - 24;
+    }
+    else {
+      this.spi.position.x = this.hitBox.position.x + 18;
+      this.spi.position.y = this.hitBox.position.y - 24;
+    }
   }
+
 
   doAll() {
     this.handleInput();
     this.spi.update();
     this.spi.draw();
+    // console.log(this.spi.position.x, this.spi.position.y);
+    // console.log(this.spi.ani);
+    console.log(this.isJumping);
+    this.spi.scale = 2;
   }
 }
-
-window.King = King;
