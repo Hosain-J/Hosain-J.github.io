@@ -165,6 +165,60 @@ function buildWallColliders() {
       }
     }
   }
+
+  // add decoration colliders for dec1.png to dec4.png only
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const src = layers.decoration[y][x];
+      
+      if (src && decPaths.includes(src)) {
+        // Extract number from 'blocks/decoration/decX.png'
+        const match = src.match(/dec(\d+)\.png$/);
+        if (match) {
+          const num = parseInt(match[1]);
+          if (num >= 1 && num <= 4) {
+            let s = new Sprite(
+              offsetX + x * tileSize + tileSize / 2,
+              offsetY + y * tileSize + tileSize / 4 - 4,
+              tileSize,
+              tileSize / 3
+            );
+            s.collider = 'static';
+            s.debug = true;
+            s.color = color(255, 0, 0, 100);
+            walls.add(s);
+          }
+        }
+      }
+    }
+  }
+
+  // add decoration colliders for dec9.png to dec12.png only
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const src = layers.decoration[y][x];
+      
+      if (src && decPaths.includes(src)) {
+        // Extract number from 'blocks/decoration/decX.png'
+        const match = src.match(/dec(\d+)\.png$/);
+        if (match) {
+          const num = parseInt(match[1]);
+          if (num >= 9 && num <= 12) {
+            let s = new Sprite(
+              offsetX + x * tileSize + tileSize / 2,
+              offsetY + y * tileSize + tileSize / 4 - 8,
+              tileSize,
+              tileSize / 8
+            );
+            s.collider = 'static';
+            s.debug = true;
+            s.color = color(255, 0, 0, 100);
+            walls.add(s);
+          }
+        }
+      }
+    }
+  }
 }
 
 

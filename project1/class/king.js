@@ -1,5 +1,8 @@
 const GRAVITY = 0.4;
 const MAX_FALL_SPEED = 8;
+const cols     = 20;
+const rows     = 14;
+const tileSize = 64;
 
 class King {
   constructor() {
@@ -56,7 +59,7 @@ class King {
     this.isJumping = false;
   }
 
-  handleInput() {
+  handleInput(walls) {
   // Horizontal movement
     if (keyIsDown(RIGHT_ARROW)) {
       this.hitBox.vel.x = 6;
@@ -134,8 +137,8 @@ class King {
   }
 
 
-  doAll() {
-    this.handleInput();
+  doAll(walls) {
+    this.handleInput(walls);
     this.spi.update();
     this.spi.draw();
     // console.log(this.spi.position.x, this.spi.position.y);
