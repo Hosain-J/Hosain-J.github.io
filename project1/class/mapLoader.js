@@ -148,7 +148,9 @@ class MapLoader {
   }
 
   buildWallColliders() {
-    this.walls.forEach(s => s.remove());
+    for (let i = this.walls.length - 1; i >= 0; i--) {
+      this.walls[i].remove();
+    }
 
     const gridW = this.cols * this.tileSize;
     const gridH = this.rows * this.tileSize;

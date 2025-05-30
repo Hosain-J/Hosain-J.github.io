@@ -11,6 +11,7 @@
 -[local storage](local)
 -[platformer game tries](pgt)
 -[inheretance](inheretance)
+-[recorsion](recorsion)
 
 # CS30 Projects
 -[CS30 project 1](game-1)
